@@ -53,7 +53,7 @@ int main(int argc, char* argv[]) {
   // to 11 instead? How about 100? 1000? Make sure to set
   // the second argument back to 10 when you are done
   // testing.
-  // Answer:
+  // Answer: Segmentation fault may occurs.
   fillArray(array, 10);
 
   int value;
@@ -65,7 +65,9 @@ int main(int argc, char* argv[]) {
   // TODO(2): We can actually use the address of the value
   // declared here as if it were an array of a single
   // element; why is this possible?
-  // Answer:
+  // Answer: The argument of fillArray() is int*, so &value
+  // is legal. Here we treat a single int as an array of 
+  // int with length of 1.
   fillArray(&value, 1);
   // fillArray should set value to 0 * 3 + 2 = 2.
   assert(value == 2);
@@ -116,7 +118,7 @@ int main(int argc, char* argv[]) {
   // it. valgrind is a tool for analyzing how programs
   // use memory, which is often invaluable for C and
   // C++ programming.
-  // Answer:
+  // Answer: Without free(), memory leak occurs.
   free(heap_array);
 
   // TODO(4): Now it's your turn to write some code.
@@ -131,5 +133,13 @@ int main(int argc, char* argv[]) {
   // you would expect. (Hint, you'll need to use the
   // -> operator to access fields of a FourInts*
   // variable instead of the . operator).
+  FourInts* my_ints = (FourInts*) malloc(sizeof(int) * 6);
+  fillArray((int*) my_ints, 6);
+  assert(my_ints->a == 2);
+  assert(my_ints->b == 5);
+  assert(my_ints->c == 8);
+  assert(my_ints->d == 11);
+  free(my_ints);
+
   return 0;
 }
