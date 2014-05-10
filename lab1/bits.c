@@ -261,7 +261,10 @@ int bang(int x) {
  *   Rating: 3
  */
 int conditional(int x, int y, int z) {
-  return 2;
+  int merged = (x>>24 | x>>16 | x>>8 | x) & 0xff;
+  int carry = (merged + 0xff) >> 8;
+  int condition = carry << 31 >> 31;
+  return (condition & y) | (~condition & z);
 }
 // Extra Credit: Rating: 4
 /*
@@ -273,5 +276,6 @@ int conditional(int x, int y, int z) {
  *   Rating: 4
  */
 int isPower2(int x) {
+  int sign = (x >> 31) & 1;
   return 2;
 }
