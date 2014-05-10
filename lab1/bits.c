@@ -276,6 +276,11 @@ int conditional(int x, int y, int z) {
  *   Rating: 4
  */
 int isPower2(int x) {
-  // int sign = (x >> 31) & 1;
-  return 2;
+  int sign = (x >> 31) & 1;
+  int negative_one = 1 << 31 >> 31;
+  int less = x + negative_one;
+  // 1. not negative
+  // 2. not zero
+  // 3. x & x-1 == 0
+  return !sign &  !!x & !(x & less);
 }
