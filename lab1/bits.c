@@ -160,9 +160,27 @@ int thirdBits(void) {
  *   Max ops: 15
  *   Rating: 2
  */
+// TODO: number of ops exceeds
 int fitsBits(int x, int n) {
-  int sign = (x >> 31) & 1;
-  return 2;
+  int sign;
+  int base;
+  int negative_one;
+  int n_1;
+  int positive;
+  int negative;
+  int positive_fit;
+  int negative_fit;
+
+  sign = (x >> 31) & 1;
+  base = 0xff;
+  negative_one = base << 8 | base;
+  negative_one = negative_one << 16 | negative_one;
+  n_1 = n + negative_one;
+  positive = (sign + 1) & 1;
+  negative = sign;
+  positive_fit = !(x >> n_1);
+  negative_fit = !(~x >> n_1);
+  return (positive & positive_fit) | (negative & negative_fit);
 }
 /* 
  * sign - return 1 if positive, 0 if zero, and -1 if negative
@@ -187,7 +205,7 @@ int sign(int x) {
  *   Rating: 2
  */
 int getByte(int x, int n) {
-  return 2;
+  return (x >> (n << 3)) & 0xff;
 }
 // Rating: 3
 /* 
@@ -199,7 +217,7 @@ int getByte(int x, int n) {
  *   Rating: 3 
  */
 int logicalShift(int x, int n) {
-  return 2;
+  return (x >> n) & ~(1 << 31 >> n << 1);
 }
 /* 
  * addOK - Determine if can compute x+y without overflow
@@ -210,7 +228,16 @@ int logicalShift(int x, int n) {
  *   Rating: 3
  */
 int addOK(int x, int y) {
-  return 2;
+  int x_sign = (x >> 31) & 1;
+  int y_sign = (y >> 31) & 1;
+  int both_positive = ~x_sign & ~y_sign;
+  int both_negative = x_sign & y_sign;
+  int hi = ((x + y) >> 31) & 1;
+  // 1. x and y have different signs;
+  // 2. both positive and the 31th bit (start from right 0th) of sum is 0;
+  // 3. both negative and the 31th bit of sum is 1;
+  return (x_sign ^ y_sign) | (both_positive & (hi + 1) & 1) 
+          | (both_negative & hi);
 }
 // Rating: 4
 /* 
@@ -221,7 +248,9 @@ int addOK(int x, int y) {
  *   Rating: 4 
  */
 int bang(int x) {
-  return 2;
+  int merged = ((x >> 24) | (x >> 16) | (x >> 8) | x) & 0xff;
+  int carry = (merged + 0xff) >> 8;
+  return (carry + 1) & 1;
 }
 // Extra Credit: Rating: 3
 /* 
